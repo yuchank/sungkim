@@ -1,9 +1,13 @@
 import tensorflow as tf
+tf.set_random_seed(777)     # for reproducibility
 
 # X and Y data
 x_train = [1, 2, 3]
 y_train = [1, 2, 3]
 
+# Try to find value for W and b to compute y_data = x_data * W = b
+# We know that W should be 1 and b should be 0
+# But let's TensorFlow figure it out
 W = tf.Variable(tf.random_normal([1]), name='weight')
 b = tf.Variable(tf.random_normal([1]), name='bias')
 
@@ -26,5 +30,5 @@ sess.run(tf.global_variables_initializer())
 # fit the line 
 for step in range(2001):
     sess.run(train)
-    if step % 20 == 0:
+    if step % 200 == 0:
         print(step, sess.run(cost), sess.run(W), sess.run(b))
