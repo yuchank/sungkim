@@ -2,10 +2,9 @@
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import random
+from tensorflow.examples.tutorials.mnist import input_data
 
 tf.set_random_seed(777)     # for reproducibility
-
-from tensorflow.examples.tutorials.mnist import input_data
 
 # Check out https://www.tensorflow.org/get_started/mnist/beginners for
 # more information about the mnist dataset
@@ -36,4 +35,31 @@ accuracy = tf.reduce_mean(tf.cast(is_correct, tf.float32))
 # parameters
 num_epochs = 15
 batch_size = 100
-num_iterations = int(mnist.train.num_examples / batch_size)
+num_iterations = int(mnist.train.num_examples / batch_size)     # 55,000 / 100 = 550
+
+with tf.Session() as sess:
+    # Initialize TensorFlow variables
+    sess.run(tf.global_variables_initializer())
+    # Training cycle
+    for epoch in range(num_epochs):
+        avg_cost = 0
+
+        for i in range(num_iterations):     # 550 times
+            batch_xs, batch_ys = mnist.train.next_batch(batch_size)
+            _, cost_val = sess.run([train, cost], feed_dict={X: batch_xs, Y: batch_ys})
+            avg_cost += cost_val / num_iterations
+
+        print('Epoch: {:04d}, Cost: {:.9f}'.format(epoch + 1, avg_cost))
+
+    print('Learning finished')
+
+    # Test the model using test sets
+    print('Accuracy: ', accuracy.eval(session=sess, feed_dict={X: mnist.test.images, Y: mnist.test.labels}))
+
+    # Get one and predict
+    r = random.randint(0, mnist.test.num_examples - 1)
+    print('Label: ', sess.run(tf.argmax(mnist.test.labels[r: r + 1], 1)))
+    print('Prediction: ', sess.run(tf.argmax(hypothesis, 1), feed_dict={X: mnist.test.images[r: r + 1]}))
+
+    plt.imshow(mnist.test.images[r: r + 1].reshape(28, 28), cmap="Greys", interpolation="nearest")
+    plt.show()
